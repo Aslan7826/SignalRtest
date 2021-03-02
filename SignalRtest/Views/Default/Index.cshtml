@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<div>
+    <label>name</label>
+    <input id="name" name="name" />
+</div>
+<div>
+    <label>message</label>
+    <input id="message" name="message" />
+</div>
+<div id="show"></div>
+<input type="button" id="sendmessage" value="sub" />
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.signalR-2.4.0.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script>
+        $(function () {
+            // Create Hub Proxy
+            var broadcastHub = $.connection.broadcastHub;
+
+            //註冊給伺服器端呼叫的方法
+            broadcastHub.client.showmessage = function (name, message) {
+                $("#show").append('<li><strong>' + htmlEncode(name) + '</strong>: ' + htmlEncode(message) + '</li>');
+            }
+            // 連線到 SignalR 伺服器
+            $.connection.hub.start().done(function () {
+                // ToDo: 與伺服器連線註冊成功後要執行的作業
+                $('#sendmessage').click(function () {
+                    broadcastHub.server.broadcast($('#name').val(), $('#message').val());
+                });
+            })
+            function htmlEncode(value) {
+                var encodedValue = $('<div />').text(value).html();
+                return encodedValue;
+            }
+        })
+    </script>
+}
