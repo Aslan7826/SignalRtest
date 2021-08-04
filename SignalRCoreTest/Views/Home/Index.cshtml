@@ -1,0 +1,65 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<div>
+    <label>name</label>
+    <input id="name" name="name" />
+</div>
+<div>
+    <label>message</label>
+    <input id="message" name="message" />
+</div>
+<div id="show"></div>
+<input type="button" id="sendmessage" value="sub" />
+
+
+     @section scripts
+{
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.7/signalr.min.js"></script>
+
+    <script>
+        $(function () {
+            // Create Hub Proxy
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/hub/BroadcastHub")
+                .build();
+
+            connection.on("showmessage", (name, message) => {
+                    $("#show").append('<li><strong>' + htmlEncode(name) + '</strong>: ' + htmlEncode(message) + '</li>');
+                });
+
+            
+            async function start() {
+                try {
+                    await connection.start();
+                    console.log("SignalR Connected.");
+                } catch (err) {
+                    console.log(err);
+                    setTimeout(start, 5000);
+                }
+            };
+    
+            connection.onclose(async () => {
+                await start();
+            });
+
+            // Start the connection.
+            start();
+            $('#sendmessage').click(function () {
+
+                const name = $("#name").val();
+                const msg = $("#message").val();
+                   connection.invoke("Broadcast",name,msg)
+                });
+            function htmlEncode(value) {
+                var encodedValue = $('<div />').text(value).html();
+                return encodedValue;
+            }
+        })
+    </script>
+
+ }
