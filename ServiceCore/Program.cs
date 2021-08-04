@@ -22,6 +22,7 @@ namespace ServiceCore
             _Con.On("showmessage", (string name, string message) =>
             {
                 Console.WriteLine($"{name}, {message}\r\n");
+                _Con.InvokeAsync("TaskResult", "I Get");
             });
             _Con.StartAsync().Wait();
             Console.Read();

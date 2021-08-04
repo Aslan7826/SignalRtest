@@ -32,7 +32,9 @@
                     $("#show").append('<li><strong>' + htmlEncode(name) + '</strong>: ' + htmlEncode(message) + '</li>');
                 });
 
-            
+            connection.on("WebTaskResult", ( message) => {
+                    $("#show").append('<li>'+ htmlEncode(message) + '</li>');
+                });
             async function start() {
                 try {
                     await connection.start();
